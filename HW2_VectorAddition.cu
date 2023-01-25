@@ -38,9 +38,9 @@ void Innitialize()
 //Cleaning up memory after we are finished.
 void CleanUp()
 {
-	cudaFree(A_CPU);
-	cudaFree(B_CPU);
-	cudaFree(C_CPU);
+	free(A_CPU);
+	free(B_CPU);
+	free(C_CPU);
 }
 
 //Adds vectors A and B then stores result in vector C
