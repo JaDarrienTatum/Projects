@@ -5,9 +5,9 @@
 #include <stdio.h>
 
 //Length of vectors to be added.
-#define N 30.
+#define N 30
 
-//Globals
+//Globals.
 float *A_CPU, *B_CPU, *C_CPU; //CPU pointers
 float *A_GPU, *B_GPU, *C_GPU; //GPU pointers
 dim3 BlockSize; //This variable will hold the Dimensions of your block
