@@ -62,12 +62,12 @@ void CleanUp()
 //It adds vectors A and B then stores result in vector C
 __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 {
-	int i;
+int id = BlockSize.x
 	
-	for(i = 0; i < N; i++)
-	{		
-	c[i] = a[i] + b[i];	
-		}
+	if(id < N)
+	{
+		c[id] = a[id] + b[id];
+	}
 }
 
 int main()
@@ -92,7 +92,7 @@ int main()
 	cudaMemcpyAsync(B_GPU, B_CPU, N*sizeof(float), cudaMemcpyHostToDevice);
 	
 	//Calling the Kernel (GPU) function.	
-	AdditionGPU???(A_GPU, B_GPU, C_GPU, N);
+	AdditionGPU<<<GridSize,BlockSize>>>(A_GPU, B_GPU, C_GPU, N);
 	
 	//Copy Memory from GPU to CPU	
 	cudaMemcpyAsync(C_CPU, C_GPU, N*sizeof(float), cudaMemcpyDeviceToHost);
