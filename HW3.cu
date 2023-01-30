@@ -97,7 +97,7 @@ int main()
 	//Copy Memory from GPU to CPU	
 	cudaMemcpyAsync(C_CPU, C_GPU, N*sizeof(float), cudaMemcpyDeviceToHost);
 
-	//Stopping the timer
+	//Stopping the timer.
 	gettimeofday(&end, NULL);
 
 	//Calculating the total time used in the addition and converting it to milliseconds.
