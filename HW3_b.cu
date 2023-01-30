@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 //Length of vectors to be added.
-#define N 30
+#define N 30.
 
 //Globals
 float *A_CPU, *B_CPU, *C_CPU; //CPU pointers
