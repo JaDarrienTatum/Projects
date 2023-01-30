@@ -63,6 +63,7 @@ void CleanUp()
 __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 {
 	int i;
+	i = BlockSize.x
 	
 	for(i = 0; i < N; i++)
 	{		
