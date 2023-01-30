@@ -62,7 +62,12 @@ void CleanUp()
 //It adds vectors A and B then stores result in vector C
 __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 {
-	???
+	int i;
+	
+	for(i = 0; i < N; i++)
+	{		
+	c[i] = a[i] + b[i];	
+		}
 }
 
 int main()
