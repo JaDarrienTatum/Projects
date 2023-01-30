@@ -62,7 +62,7 @@ void CleanUp()
 //It adds vectors A and B then stores result in vector C
 __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 {
-int id = threadIdx.x
+int id = threadIdx.x;
 	
 	if(id < N)
 	{
