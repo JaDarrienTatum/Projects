@@ -1,5 +1,5 @@
 //Vector addition on the GPU with 1 block
-//nvcc VectorAdditionGPU1Block.cu -o VectorAdditionGPU1Block
+//nvcc HW3.cu -o VectorAdditionGPU1Block
 
 #include <sys/time.h>
 #include <stdio.h>
