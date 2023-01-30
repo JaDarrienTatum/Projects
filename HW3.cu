@@ -83,13 +83,14 @@ int main()
 	gettimeofday(&start, NULL);
 
 	//Copy Memory from CPU to GPU		
-	???
+	cudaMemcpyAsync(A_GPU, A_CPU, N*sizeof(float), cudaMemcpyHostToDevice);
+	cudaMemcpyAsync(B_GPU, B_CPU, N*sizeof(float), cudaMemcpyHostToDevice);
 	
 	//Calling the Kernel (GPU) function.	
 	AdditionGPU???(A_GPU, B_GPU, C_GPU, N);
 	
 	//Copy Memory from GPU to CPU	
-	???
+	cudaMemcpyAsync(C_CPU, C_GPU, N*sizeof(float), cudaMemcpyDeviceToHost);
 
 	//Stopping the timer
 	gettimeofday(&end, NULL);
