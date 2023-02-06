@@ -62,7 +62,13 @@ void CleanUp()
 //It adds vectors A and B then stores result in vector C
 __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 {
-	???
+	int id = threadIdx.x + blockDim.x*blockIdx.x;
+	
+	while(id < N)
+	{
+		c[id] = a[id] + b[id];
+		id += blockDim.x * gridIdx.x
+	}
 }
 
 int main()
