@@ -67,7 +67,7 @@ __global__ void AdditionGPU(float *a, float *b, float *c, int n)
 	while(id < N)
 	{
 		c[id] = a[id] + b[id];
-		id += blockDim.x * gridIdx.x
+		id += blockDim.x * gridDim.x;
 	}
 }
 
