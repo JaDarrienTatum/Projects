@@ -24,6 +24,34 @@ float yMax =  2.0;
 float stepSizeX = (xMax - xMin)/((float)window_width);
 float stepSizeY = (yMax - yMin)/((float)window_height);
 
+//Globals
+float *A_GPU, *B_GPU, *C_GPU; //GPU pointers
+dim3 BlockSize; //This variable will hold the Dimensions of your block
+dim3 GridSize; //This variable will hold the Dimensions of your grid
+
+//This will be the layout of the parallel space we will be using.
+void SetUpCudaDevices()
+{
+	BlockSize.x = 1024; // ** Don't change this
+	BlockSize.y = 1;
+	BlockSize.z = 1;
+	
+	GridSize.x = 1; // ** Don't change this
+	GridSize.y = 1;
+	GridSize.z = 1;
+}
+
+//Sets a side memory on the GPU and CPU for our use.
+void AllocateMemory()
+{					
+	//Allocate Device (GPU) Memory
+	cudaMalloc(&A_GPU,N*sizeof(float));
+	cudaMalloc(&B_GPU,N*sizeof(float));
+	cudaMalloc(&C_GPU,N*sizeof(float));
+
+	
+}
+
 float color (float x, float y) 
 {
 	float mag,maxMag,temp;
