@@ -71,14 +71,15 @@ void CleanUp()
 __global__ void DotProductGPU(float *a, float *b, float *c, int n)
 {
 	int id = threadIdx.x;
-	*************************************************
-	???
-	************************************************
+	
+	
+	
+	
 }
 
 int main()
 {
-	float ???;
+	float dot;
 	timeval start, end;
 	
 	//Set the thread structure that you will be using on the GPU	
