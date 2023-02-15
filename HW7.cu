@@ -72,7 +72,28 @@ __global__ void DotProductGPU(float *a, float *b, float *c, int n)
 {
 	int id = threadIdx.x;
 	
+	c[id] = a[id] * b[id];
+	__syncthreads();
+	int fold = blockDim.x;
 	
+	while (fold >= 2)
+	{
+	
+		if (fold %2 == 1)
+		{
+			if (id == 0)
+			{
+				c[0] += c[fold -1];
+			}
+			fold--;
+		}
+		if (id <= fold/2)
+		{
+			c[id] += c[id + fold/2];
+		}
+		fold/= 2;
+		__syncthreads();
+	}
 	
 	
 }
@@ -105,7 +126,7 @@ int main()
 	myCudaErrorCheck(__FILE__, __LINE__);
 	
 	//Copy Memory from GPU to CPU	
-	cudaMemcpyAsync(???, &C_GPU[0], sizeof(float), cudaMemcpyDeviceToHost);
+	cudaMemcpyAsync(&dot, &C_GPU[0], sizeof(float), cudaMemcpyDeviceToHost);
 	myCudaErrorCheck(__FILE__, __LINE__);
 
 	//Stopping the timer
