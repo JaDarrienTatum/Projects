@@ -45,7 +45,7 @@ void AllocateMemory()
 	myCudaErrorCheck(__FILE__, __LINE__);
 	cudaMalloc(&B_GPU,N*sizeof(float));
 	myCudaErrorCheck(__FILE__, __LINE__);
-	cudaMalloc(&C_GPU,N*sizeof(float));
+	cudaMalloc(&C_GPU,(N+11)*sizeof(float));
 	myCudaErrorCheck(__FILE__, __LINE__);
 
 	//Allocate Host (CPU) Memory
@@ -78,11 +78,35 @@ __global__ void DotProductGPU(float *a, float *b, float *c, int n)
 {
 	int threadNumber = threadIdx.x;
 	int vectorNumber = threadIdx.x + blockDim.x*blockIdx.x;
-	int temp;
+	//int temp;
 	
-	********************************************
-	???
-	********************************************
+	if(vectorNumber < n)
+	{
+		c[vectorNumber] = a[vectorNumber] * b[vectorNumber];
+	}
+	__syncthreads();
+	int fold = blockDim.x;
+	
+	while (fold > 2 && threadNumber<fold/2)
+	{
+	
+		if (fold %2 == 1)
+		{
+			if (threadNumber == 0)
+			{
+				c[vectorNumber] += c[vectorNumber + fold-1];
+			}
+			fold--;
+		}
+		__syncthreads();
+		fold/= 2;
+		if (threadNumber < fold)
+		{
+			c[vectorNumber] += c[vectorNumber + fold];
+		}
+		__syncthreads();
+	}
+	
 }
 
 int main()
@@ -117,7 +141,7 @@ int main()
 	printf("\n grid size = %d\n", GridSize.x);
 	for(int k = 0; k < GridSize.x; k++)
 	{
-		cudaMemcpyAsync(&temp, ???, sizeof(float), cudaMemcpyDeviceToHost);
+		cudaMemcpyAsync(&temp, &C_GPU[k * BlockSize.x], sizeof(float), cudaMemcpyDeviceToHost);
 		myCudaErrorCheck(__FILE__, __LINE__);
 		dotProduct += temp;
 	}
