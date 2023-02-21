@@ -5,7 +5,7 @@ void myCudaErrorCheck(const char* file, int line)
 
 	if (error != cudaSuccess)
 	{
-		printf("\n CUDA message = %s, File = %s, Line = %d\n", cudaGetErrorString(error), file, line);
+		printf("\n CUDA message = %s, File = %s, Line = %d\n", cudaGetErrorString(error), file, line-1);
 		exit(0);
 	}
 }
