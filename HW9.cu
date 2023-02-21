@@ -111,13 +111,13 @@ __global__ void DotProductGPU(float *a, float *b, float *DotGPU, int n)
 	
 	//***********************************
 	
-	if (vectorNumber < n)
+	 (vectorNumber < n)
 		{
 			c_sh[threadNumber] = a[vectorNumber] * b[vectorNumber];
 		}
 	__syncthreads();
 		
-	while (fold>2 && threadNumber<fold/2)
+	while (fold>=2 && threadNumber<fold/2)
 		{
 			fold = fold/2;
 			if(threadNumber<fold && (vectorNumber+fold)<n)
