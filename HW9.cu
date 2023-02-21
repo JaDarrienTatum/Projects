@@ -77,8 +77,8 @@ void AllocateMemory(float vectorSize)
 	B_CPU = (float*)malloc(vectorSize*sizeof(float));
 	
 	//Setting the vector to zero so the ectra values will not affect the dot product.
-	memset(???);
-	memset(???);
+	memset(A_CPU, 0.0, vectorSize*sizeof(float));
+	memset(B_CPU, 0.0, vectorSize*sizeof(float));
 }
 
 //Loads values into vectors that we will add.
@@ -106,15 +106,31 @@ __global__ void DotProductGPU(float *a, float *b, float *DotGPU, int n)
 {
 	int threadNumber = threadIdx.x;
 	int vectorNumber = threadIdx.x + blockDim.x*blockIdx.x;
+	int fold = blockDim.x; 
 	__shared__ float c_sh[BLOCK_SIZE];
 	
-	***********************************
-	???
-	***********************************
+	//***********************************
+	
+	if (vectorNumber < n)
+		{
+			c_sh[threadNumber] = a[vectorNumber] * b[vectorNumber];
+		}
+	__syncthreads();
+		
+	while (fold>2 && threadNumber<fold/2)
+		{
+			fold = fold/2;
+			if(threadNumber<fold && (vectorNumber+fold)<n)
+			{
+				c_sh[threadNumber] += c_sh[threadNumber + fold];
+			}
+		__syncthreads();
+		}
+	//***********************************
 	
 	if(threadNumber == 0) 
 	{
-		???
+		atomicAdd(DotGPU, c_sh[threadNumber]);
 	}
 }
 
@@ -140,7 +156,7 @@ int main()
 		exit(0);
 	}
 	
-	int vectorSize = ???;
+	int vectorSize = N + N%BLOCK_SIZE;
 	
 	//Set the thread structure that you will be using on the GPU	
 	SetUpCudaDevices(vectorSize);
@@ -168,7 +184,7 @@ int main()
 	DotProductGPU<<<GridSize,BlockSize>>>(A_GPU, B_GPU, DotGPU, vectorSize);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	//Copy Memory from GPU to CPU	
-	cudaMemcpyAsync(???);
+	cudaMemcpyAsync(&dotGPU, DotGPU, sizeof(float), cudaMemcpyDeviceToHost);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	gettimeofday(&end, NULL);
 	time = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
