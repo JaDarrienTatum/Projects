@@ -38,8 +38,8 @@ void SetUpCudaDevices(int vectorSize)
 		printf("\n You are trying to create more threads (%d) than your GPU can suppport on a block (%d).\n Good Bye\n", BlockSize.x, prop.maxThreadsDim[0]);
 		exit(0);
 	}
-	int temp = BlockSize.x;
-	while(1 < temp)
+	int temp = BlockSize.x; //setting temp = blocksize.x = 64
+	while(1 < temp) //checking to make sure your block size is a power of 2 by seeing if the remainder is not equal to 0
 	{
 		if(temp%2 != 0)
 		{
@@ -77,8 +77,8 @@ void AllocateMemory(float vectorSize)
 	B_CPU = (float*)malloc(vectorSize*sizeof(float));
 	
 	//Setting the vector to zero so the ectra values will not affect the dot product.
-	memset(A_CPU, 0.0, vectorSize*sizeof(float));
-	memset(B_CPU, 0.0, vectorSize*sizeof(float));
+	memset(A_CPU, 0.0, vectorSize*sizeof(float)); //we are setting A_CPU floats to 0.0
+	memset(B_CPU, 0.0, vectorSize*sizeof(float)); //making sure whatever A_CPU & B_CPU grab is 0.0
 }
 
 //Loads values into vectors that we will add.
@@ -107,17 +107,17 @@ __global__ void DotProductGPU(float *a, float *b, float *DotGPU, int n)
 	int threadNumber = threadIdx.x;
 	int vectorNumber = threadIdx.x + blockDim.x*blockIdx.x;
 	int fold = blockDim.x; 
-	__shared__ float c_sh[BLOCK_SIZE];
+	__shared__ float c_sh[BLOCK_SIZE]; //sharing info between the threads in a block
 	
 	//***********************************
 	
-	if (vectorNumber < n)
+	if (vectorNumber < n) //just vector multiplication 
 		{
 			c_sh[threadNumber] = a[vectorNumber] * b[vectorNumber];
 		}
 	__syncthreads();
 		
-	while (fold>=2 && threadNumber<fold/2)
+	while (fold>=2 && threadNumber<fold/2) //this is setting up our folds and preventing using any thread # thats more than half our fold.
 		{
 			fold = fold/2;
 			if(threadNumber<fold && (vectorNumber+fold)<n)
@@ -130,7 +130,7 @@ __global__ void DotProductGPU(float *a, float *b, float *DotGPU, int n)
 	
 	if(threadNumber == 0) 
 	{
-		atomicAdd(DotGPU, c_sh[threadNumber]);
+		atomicAdd(DotGPU, c_sh[threadNumber]); //atomicAdd is making sure that every 0 thread is storing its value here.
 	}
 }
 
@@ -156,7 +156,7 @@ int main()
 		exit(0);
 	}
 	
-	int vectorSize = N + N%BLOCK_SIZE;
+	int vectorSize = N + N%BLOCK_SIZE; // we are filling our last block to make it an integer. N is 214748 and BLOCK_SIZE is 64.
 	
 	//Set the thread structure that you will be using on the GPU	
 	SetUpCudaDevices(vectorSize);
@@ -184,7 +184,7 @@ int main()
 	DotProductGPU<<<GridSize,BlockSize>>>(A_GPU, B_GPU, DotGPU, vectorSize);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	//Copy Memory from GPU to CPU	
-	cudaMemcpyAsync(&dotGPU, DotGPU, sizeof(float), cudaMemcpyDeviceToHost);
+	cudaMemcpyAsync(&dotGPU, DotGPU, sizeof(float), cudaMemcpyDeviceToHost); //we are making dotGPU equal DotGPU. &dotGPU is a location
 	myCudaErrorCheck(__FILE__, __LINE__);
 	gettimeofday(&end, NULL);
 	time = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
