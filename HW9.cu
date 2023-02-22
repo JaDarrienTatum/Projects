@@ -184,7 +184,7 @@ int main()
 	DotProductGPU<<<GridSize,BlockSize>>>(A_GPU, B_GPU, DotGPU, vectorSize);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	//Copy Memory from GPU to CPU	
-	cudaMemcpyAsync(&dotGPU, DotGPU, sizeof(float), cudaMemcpyDeviceToHost); //we are making dotGPU equal DotGPU. &dotGPU is a location
+	cudaMemcpyAsync(&dotGPU, DotGPU, sizeof(float), cudaMemcpyDeviceToHost); //we are making dotGPU equal DotGPU.
 	myCudaErrorCheck(__FILE__, __LINE__);
 	gettimeofday(&end, NULL);
 	time = (end.tv_sec * 1000000 + end.tv_usec) - (start.tv_sec * 1000000 + start.tv_usec);
