@@ -32,7 +32,7 @@ void SetUpCudaDevices(int vectorSize)
 	
 	//printf("\n prop.maxGridSize[0] = %d", prop.maxGridSize[0]);
 	
-	BlockSize.x = BLOCK_SIZE;
+	BlockSize.x = BLOCK_SIZE; //setting BlockSize.x equal to 64
 	if(prop.maxThreadsDim[0] < BlockSize.x)
 	{
 		printf("\n You are trying to create more threads (%d) than your GPU can suppport on a block (%d).\n Good Bye\n", BlockSize.x, prop.maxThreadsDim[0]);
