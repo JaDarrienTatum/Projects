@@ -111,7 +111,7 @@ __global__ void DotProductGPU(float *a, float *b, float *DotGPU, int n)
 	
 	//***********************************
 	
-	 (vectorNumber < n)
+	if (vectorNumber < n)
 		{
 			c_sh[threadNumber] = a[vectorNumber] * b[vectorNumber];
 		}
