@@ -95,8 +95,8 @@ __device__ float getEscapeValue(float x, float y, float a, float b)
 		//We will be changing the x but we need its old value to find y.	
 		tempX = x; 
 		x = x*x - y*y + a;
-		y = (2.0 * tempX * y) + b;
-		mag = sqrt(x*x + y*y);
+		y = sin((2.0 * tempX * y) + b);
+		mag = exp(sqrt(x*x + y*y));
 		count++;
 	}
 	return((float)count/(float)maxCount);
@@ -119,9 +119,9 @@ __global__ void colorPixels(float *pixels, float xMin, float yMin, float dx, flo
 	pixels[id] = escapeValue; //Setting the red
 	if(0.99999 < escapeValue)
 	{
-		pixels[id]   = 1.0; //Setting the red
+		pixels[id]   = 0.0; //Setting the red
 		pixels[id+1] = 0.0; //Setting the green
-		pixels[id+2] = 0.0; //Setting the blue
+		pixels[id+2] = 1.0; //Setting the blue
 	}
 	else
 	{
