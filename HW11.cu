@@ -25,7 +25,7 @@ struct sphereStruct
 	float x,y,z; // Sphere center
 };
 
-static int Window;
+static int Window; // Static is a nonchangable variable
 unsigned int WindowWidth = WINDOWWIDTH;
 unsigned int WindowHeight = WINDOWHEIGHT;
 
@@ -34,7 +34,7 @@ cudaEvent_t Start, Stop;
 dim3 BlockSize, GridSize;
 float *PixelsCPU, *PixelsGPU; 
 sphereStruct *SpheresCPU;
-__constant__ sphereStruct SpheresGPU[NUMSPHERES];
+__constant__ sphereStruct SpheresGPU[NUMSPHERES]; // Putting sphereStuct and SpheresGPU in constant memory
 
 // prototyping functions
 void Display();
@@ -98,7 +98,7 @@ __global__ void makeSphersBitMap(float *pixels)
 	// Finding this pixels location in memory
 	int id = 3*(threadIdx.x + blockIdx.x*blockDim.x);
 	
-	//initialize rgb values for each pixel to zero (black)
+	//initialize r, g, b values for each pixel to zero (black)
 	float pixelr = 0.0f;
 	float pixelg = 0.0f;
 	float pixelb = 0.0f;
@@ -123,7 +123,7 @@ __global__ void makeSphersBitMap(float *pixels)
 	pixels[id+2] = pixelb;
 }
 
-void makeRandomSpheres()
+void makeRandomSpheres() //just creating random spheres
 {	
 	float rangeX = XMAX - XMIN;
 	float rangeY = YMAX - YMIN;
