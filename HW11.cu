@@ -1,4 +1,4 @@
-//nvcc HW11.cu -o temp -lglut -lGL -lm
+//nvcc RayTracerConstantMemoryEventTiming.cu -o temp -lglut -lGL -lm
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
