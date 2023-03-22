@@ -40,7 +40,7 @@ void allocateMemory()
 	PageableNumbersOnCPU = (float*)malloc(SIZE*sizeof(float));
 	
 	//Allocate page locked Host (CPU) Memory
-	?????
+	cudaHostAlloc(&PageLockedNumbersOnCPU, SIZE*sizeof(float), cudaHostAllocDefault);
 	myCudaErrorCheck(__FILE__, __LINE__);
 }
 
@@ -50,7 +50,7 @@ void cleanUp()
 	cudaFree(NumbersOnGPU); 
 	myCudaErrorCheck(__FILE__, __LINE__);
 	
-	?????
+	cudaFreeHost(PageLockedNumbersOnCPU);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	
 	free(PageableNumbersOnCPU); 
@@ -83,7 +83,7 @@ void copyPageLockedMemoryUp()
 {
 	for(int i = 0; i < NUMBER_OF_COPIES; i++)
 	{
-		?????
+		cudaMemcpy(NumbersOnGPU, PageLockedNumbersOnCPU, SIZE*sizeof(float), cudaMemcpyHostToDevice);
 		myCudaErrorCheck(__FILE__, __LINE__);
 	}
 }
@@ -92,7 +92,7 @@ void copyPageLockedMemoryDown()
 {
 	for(int i = 0; i < NUMBER_OF_COPIES; i++)
 	{
-		?????
+		cudaMemcpy(PageLockedNumbersOnCPU, NumbersOnGPU, SIZE*sizeof(float), cudaMemcpyDeviceToHost);
 		myCudaErrorCheck(__FILE__, __LINE__);
 	}
 }
