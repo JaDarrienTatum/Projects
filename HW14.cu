@@ -25,6 +25,7 @@ float *A_GPU, *B_GPU, *C_GPU; //GPU pointers
 cudaEvent_t StartEvent, StopEvent;
 
 // Notice that we have to define a stream
+// A stream takes the gpu task and tells it to start; and when the first task is complete, the second task immediately starts. (1 stream)
 cudaStream_t Stream0;
 
 //This will be the layout of the parallel space we will be using.
@@ -52,6 +53,7 @@ void setUpCudaDevices()
 	}
 	
 	// Notice that we have to create the stream
+	// cudaStreamCreate is creating a stream for us to use.
 	cudaStreamCreate(&Stream0);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	
@@ -82,6 +84,7 @@ void allocateMemory()
 	myCudaErrorCheck(__FILE__, __LINE__);
 	
 	// Notice that we are using host page locked memory
+	// which means we are physically storing it on the gpu. so the gpu only needs to get the info from the cpu.
 	//Allocate page locked Host (CPU) Memory
 	cudaHostAlloc(&A_CPU, ENTIRE_DATA_SET*sizeof(float), cudaHostAllocDefault);
 	myCudaErrorCheck(__FILE__, __LINE__);
