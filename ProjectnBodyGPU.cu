@@ -30,6 +30,7 @@
 #define FAR 50.0
 
 //Function Prototypes
+//This comes from our HW16 Interweiving HW. 
 void set_initail_conditions():
 void setupDevice();
 void draw_picture();
@@ -46,6 +47,7 @@ void cleanup();
 float4 Position[N], Velocity[N], Force[N];
 float4 *PositionGPU, *VelocityGPU, *ForceGPU;
 dim3 Block, Grid;
+//cudaStream_t is from our HW16. this is where you create your streams that you are going to use.
 cudaStream_t Stream0, Stream1;
 
 void set_initail_conditions()
@@ -86,6 +88,7 @@ void set_initail_conditions()
 
 void setupDevice()
 {
+	//This is to create the streams that will be used in the code.
 	cudaStreamCreate(&Stream0);
 	myCudaErrorCheck(__FILE__, __LINE__);
 	cudaStreamCreate(&Stream1);
@@ -121,6 +124,23 @@ void draw_picture()
 	}
 
 	glutSwapBuffers();
+}
+
+// I put it before the global and device functions because that is how it was in the HW's
+void cleanup()
+{
+	cudaFree(PositionGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaFree(VelocityGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaFree(ForceGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	
+	//This is here to free the space used from both Streams.
+	cudaStreamDestroy(Stream0);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaStreamDestroy(Stream1);
+	myCudaErrorCheck(__FILE__, __LINE__);
 }
                                  
 __device__ float4 getBodyBodyForce(float4 p0, float4 p1)
@@ -213,8 +233,11 @@ void n_body()
 	int   tdraw = 0; 
 	float time = 0.0;
 	
+	//now we are adding the streams to the code and instead of cudaMemcpy we are using cudaMemcpyAsync
     	cudaMemcpyAsync( PositionGPU, Position, N *sizeof(float4), cudaMemcpyHostToDevice, Stream0 );
+	myCudaErrorCheck(__FILE__, __LINE__);
     	cudaMemcpyAsync( VelocityGPU, Velocity, N *sizeof(float4), cudaMemcpyHostToDevice, Stream1 );
+	myCudaErrorCheck(__FILE__, __LINE__);
 	while(time < STOP_TIME)
 	{	
 		getForces<<<Grid, Block,0,Stream0>>>(PositionGPU, VelocityGPU, ForceGPU);
@@ -222,7 +245,7 @@ void n_body()
         
 		if(tdraw == DRAW) 
 		{
-			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream1 );
+			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream0 );
 			draw_picture();
 			printf("\n Time = %f \n", time);
 			tdraw = 0;
@@ -273,15 +296,6 @@ void reshape(int w, int h)
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void cleanup()
-{
-	cudaFree(PositionGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
-	cudaFree(VelocityGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
-	cudaFree(ForceGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
-}
 
 int main(int argc, char** argv)
 {
