@@ -31,7 +31,7 @@
 
 //Function Prototypes
 //This comes from our HW16 Interweiving HW. 
-void set_initail_conditions():
+void set_initail_conditions();
 void setupDevice();
 void draw_picture();
 __device__ float4 getBodyBodyForce(float4 *, float4 *);
@@ -91,9 +91,9 @@ void setupDevice()
 {
 	//This is to create the streams that will be used in the code.
 	cudaStreamCreate(&Stream0);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	cudaStreamCreate(&Stream1);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	
 	Block.x = BLOCK_SIZE;
 	Block.y = 1;
@@ -131,17 +131,17 @@ void draw_picture()
 void cleanup()
 {
 	cudaFree(PositionGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	cudaFree(VelocityGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	cudaFree(ForceGPU);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	
 	//This is here to free the space used from both Streams.
 	cudaStreamDestroy(Stream0);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	cudaStreamDestroy(Stream1);
-	myCudaErrorCheck(__FILE__, __LINE__);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 }
                                  
 __device__ float4 getBodyBodyForce(float4 p0, float4 p1)
@@ -235,10 +235,10 @@ void n_body()
 	float time = 0.0;
 	
 	//now we are adding the streams to the code and instead of cudaMemcpy we are using cudaMemcpyAsync
-    	cudaMemcpyAsync( PositionGPU, Position, N *sizeof(float4), cudaMemcpyHostToDevice, Stream0 );
-	myCudaErrorCheck(__FILE__, __LINE__);
-    	cudaMemcpyAsync( VelocityGPU, Velocity, N *sizeof(float4), cudaMemcpyHostToDevice, Stream1 );
-	myCudaErrorCheck(__FILE__, __LINE__);
+    	cudaMemcpy( PositionGPU, Position, N *sizeof(float4), cudaMemcpyHostToDevice);
+	//nmyCudaErrorCheck(__FILE__, __LINE__);
+    	cudaMemcpy( VelocityGPU, Velocity, N *sizeof(float4), cudaMemcpyHostToDevice);
+	//myCudaErrorCheck(__FILE__, __LINE__);
 	while(time < STOP_TIME)
 	{	
 		getForces<<<Grid, Block,0,Stream0>>>(PositionGPU, VelocityGPU, ForceGPU);
@@ -246,7 +246,7 @@ void n_body()
         
 		if(tdraw == DRAW) 
 		{
-			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream0 );
+			cudaMemcpyAsync( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream1 );
 			// might need (cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream0 ); ) it might speed up code
 			draw_picture();
 			printf("\n Time = %f \n", time);
