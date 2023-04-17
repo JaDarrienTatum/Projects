@@ -41,6 +41,7 @@ void n_body();
 void control();
 void Display(void);
 void reshape(int, int);
+// this was also in the Hw used to clear all globals. We want to make sure we are not reusing space/clearing space.
 void cleanup();
 
 // Globals
@@ -246,15 +247,19 @@ void n_body()
 		if(tdraw == DRAW) 
 		{
 			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream0 );
+			// might need (cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream0 ); ) it might speed up code
 			draw_picture();
 			printf("\n Time = %f \n", time);
 			tdraw = 0;
 			cudaStreamSynchronize(Stream0 );
+			// same for (cudaStreamSynchronize(Stream1 ); )
 		}
 		time += DT;
 		tdraw++;
 	}
 }
+
+//also am going to try (cudaStreamSynchronize(Stream0 ); ) to see if it speeds up or slows down code.
 
 void control()
 {	
