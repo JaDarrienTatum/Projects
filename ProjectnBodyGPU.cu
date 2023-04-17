@@ -29,10 +29,24 @@
 #define EYE 10.0
 #define FAR 50.0
 
+//Function Prototypes
+void set_initail_conditions():
+void setupDevice();
+void draw_picture();
+__device__ float4 getBodyBodyForce(float4 *, float4 *);
+__global__ void getForces(float4 *, float4 *, float4 *);
+__global__ void moveBodies(float , float4 *, float4 *, float4 *);
+void n_body();
+void control();
+void Display(void);
+void reshape(int, int);
+void cleanup();
+
 // Globals
 float4 Position[N], Velocity[N], Force[N];
 float4 *PositionGPU, *VelocityGPU, *ForceGPU;
 dim3 Block, Grid;
+cudaStream_t Stream0, Stream1;
 
 void set_initail_conditions()
 {
@@ -72,6 +86,11 @@ void set_initail_conditions()
 
 void setupDevice()
 {
+	cudaStreamCreate(&Stream0);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaStreamCreate(&Stream1);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	
 	Block.x = BLOCK_SIZE;
 	Block.y = 1;
 	Block.z = 1;
@@ -194,19 +213,20 @@ void n_body()
 	int   tdraw = 0; 
 	float time = 0.0;
 	
-    	cudaMemcpy( PositionGPU, Position, N *sizeof(float4), cudaMemcpyHostToDevice );
-    	cudaMemcpy( VelocityGPU, Velocity, N *sizeof(float4), cudaMemcpyHostToDevice );
+    	cudaMemcpyAsync( PositionGPU, Position, N *sizeof(float4), cudaMemcpyHostToDevice, Stream0 );
+    	cudaMemcpyAsync( VelocityGPU, Velocity, N *sizeof(float4), cudaMemcpyHostToDevice, Stream1 );
 	while(time < STOP_TIME)
 	{	
-		getForces<<<Grid, Block>>>(PositionGPU, VelocityGPU, ForceGPU);
-		moveBodies<<<Grid, Block>>>(time, PositionGPU, VelocityGPU, ForceGPU);
+		getForces<<<Grid, Block,0,Stream0>>>(PositionGPU, VelocityGPU, ForceGPU);
+		moveBodies<<<Grid, Block,0,Stream1>>>(time, PositionGPU, VelocityGPU, ForceGPU);
         
 		if(tdraw == DRAW) 
 		{
-			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost );
+			cudaMemcpy( Position, PositionGPU, N *sizeof(float4), cudaMemcpyDeviceToHost, Stream1 );
 			draw_picture();
 			printf("\n Time = %f \n", time);
 			tdraw = 0;
+			cudaStreamSynchronize(Stream0 );
 		}
 		time += DT;
 		tdraw++;
@@ -251,6 +271,16 @@ void reshape(int w, int h)
 	glFrustum(-0.2, 0.2, -0.2, 0.2, 0.2, FAR);
 
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void cleanup()
+{
+	cudaFree(PositionGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaFree(VelocityGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
+	cudaFree(ForceGPU);
+	myCudaErrorCheck(__FILE__, __LINE__);
 }
 
 int main(int argc, char** argv)
